@@ -20,7 +20,7 @@ curl https://start.spring.io/starter.tgz \
   -d groupId=ru.vspochernin \
   -d artifactId=hotel-service \
   -d name=hotel-service \
-  -d description="Hotel & Room management service of the Hotel Booking System" \
+  -d description="Hotel and Room management service of the Hotel Booking System" \
   -d javaVersion=21 \
   -d packaging=jar \
   -d dependencies=web,data-jpa,h2,validation,security,cloud-eureka,actuator,lombok \
