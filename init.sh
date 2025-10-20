@@ -3,7 +3,7 @@ set -euo pipefail
 
 # 1) Eureka Server
 mkdir -p eureka-server
-curl https://start.spring.io/starter.tgz \
+curl -fsS https://start.spring.io/starter.tgz \
   -d type=maven-project \
   -d language=java \
   -d bootVersion=3.5.6 \
@@ -18,7 +18,7 @@ curl https://start.spring.io/starter.tgz \
 
 # 2) Hotel Management Service
 mkdir -p hotel-service
-curl https://start.spring.io/starter.tgz \
+curl -fsS https://start.spring.io/starter.tgz \
   -d type=maven-project \
   -d language=java \
   -d bootVersion=3.5.6 \
@@ -33,7 +33,7 @@ curl https://start.spring.io/starter.tgz \
 
 # 3) Booking Service (fix: cloud-openfeign -> cloud-feign)
 mkdir -p booking-service
-curl https://start.spring.io/starter.tgz \
+curl -fsS https://start.spring.io/starter.tgz \
   -d type=maven-project \
   -d language=java \
   -d bootVersion=3.5.6 \
@@ -48,7 +48,7 @@ curl https://start.spring.io/starter.tgz \
 
 # 4) API Gateway
 mkdir -p api-gateway
-curl https://start.spring.io/starter.tgz \
+curl -fsS https://start.spring.io/starter.tgz \
   -d type=maven-project \
   -d language=java \
   -d bootVersion=3.5.6 \
