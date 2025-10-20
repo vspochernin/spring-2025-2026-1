@@ -25,10 +25,9 @@ eureka:
   instance:
     prefer-ip-address: true
 
-# Секрет для HS256 — пригодится, когда добавим JWT-проверку бином JwtDecoder
 security:
   jwt:
-    secret: change-me
+    secret: change-me # Общий HS256 секрет.
     ttl-seconds: 3600
 
 management:
