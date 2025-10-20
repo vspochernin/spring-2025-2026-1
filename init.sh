@@ -9,8 +9,8 @@ curl -fsS https://start.spring.io/starter.tgz \
   -d bootVersion=3.5.6 \
   -d groupId=ru.vspochernin \
   -d artifactId=eureka-server \
-  -d description="Service registry of the Hotel Booking System" \
   -d name=eureka-server \
+  -d description="Service registry of the Hotel Booking System" \
   -d javaVersion=21 \
   -d packaging=jar \
   -d dependencies=cloud-eureka-server,actuator,lombok \
@@ -28,7 +28,7 @@ curl -fsS https://start.spring.io/starter.tgz \
   -d description="Hotel and Room management service of the Hotel Booking System" \
   -d javaVersion=21 \
   -d packaging=jar \
-  -d dependencies=web,data-jpa,h2,validation,security,cloud-eureka,actuator,lombok \
+  -d dependencies=web,data-jpa,h2,validation,security,oauth2-resource-server,cloud-eureka,actuator,lombok \
   | tar -xz -C hotel-service
 
 # 3) Booking Service
