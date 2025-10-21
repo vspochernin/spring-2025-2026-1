@@ -100,8 +100,11 @@
 
 #### Gateway (маршрутизация)
 
-- /api/bookings/** -> Booking Service.
 - /api/hotels/** -> Hotel Service.
+- /api/rooms/** -> Hotel Service.
+- /api/bookings/** -> Booking Service.
+- /api/booking/** -> Booking Service.
+- /api/user/** -> Booking Service.
 
 #### Booking Service
 
