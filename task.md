@@ -96,6 +96,8 @@
 
 ### Примерная структура эндпойнтов приложения
 
+Все публичные REST-эндпойнты публикуются под префиксом `/api` и доступны через Gateway.
+
 #### Gateway (маршрутизация)
 
 - /api/bookings/** -> Booking Service.
@@ -103,15 +105,15 @@
 
 #### Booking Service
 
-- DELETE /user - удалить пользователя (ADMIN).
-- POST /user - создать пользователя (ADMIN).
-- PATCH /user - обновить данные пользователя (ADMIN).
-- POST /booking - создать бронирование (с выбором или автоподбором комнаты) (USER). В теле запроса параметр autoSelect: true/false (при true поле roomId игнорируется).
-- GET /bookings - история бронирований пользователя (USER).
-- POST /user/register - зарегистрировать пользователя, сгенерировав токен (USER).
-- POST /user/auth - авторизовать пользователя, сгенерировав токен (USER).
-- GET /booking/{id} - получить бронирование по id (USER).
-- DELETE /booking/{id} - отменить бронирование (USER).
+- DELETE /api/user - удалить пользователя (ADMIN).
+- POST /api/user - создать пользователя (ADMIN).
+- PATCH /api/user - обновить данные пользователя (ADMIN).
+- POST /api/booking - создать бронирование (с выбором или автоподбором комнаты) (USER). В теле запроса параметр autoSelect: true/false (при true поле roomId игнорируется).
+- GET /api/bookings - история бронирований пользователя (USER).
+- POST /api/user/register - зарегистрировать пользователя, сгенерировав токен (USER).
+- POST /api/user/auth - авторизовать пользователя, сгенерировав токен (USER).
+- GET /api/booking/{id} - получить бронирование по id (USER).
+- DELETE /api/booking/{id} - отменить бронирование (USER).
 
 #### Hotel Management Service
 
