@@ -17,14 +17,10 @@ spring:
               uri: lb://hotel-service
               predicates:
                 - Path=/api/hotels/**,/api/rooms/**
-              filters:
-                - StripPrefix=0
             - id: booking-route
               uri: lb://booking-service
               predicates:
                 - Path=/api/bookings/**,/api/booking/**,/api/user/**
-              filters:
-                - StripPrefix=0
 
 eureka:
   client:
