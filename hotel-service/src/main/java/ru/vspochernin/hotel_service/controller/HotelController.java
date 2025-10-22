@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.vspochernin.hotel_service.dto.CreateHotelRequest;
 import ru.vspochernin.hotel_service.dto.HotelDto;
@@ -21,6 +22,7 @@ public class HotelController {
     private final HotelService hotelService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<HotelDto> createHotel(@Valid @RequestBody CreateHotelRequest request) {
         log.info("Creating hotel: {}", request.getName());
         HotelDto hotel = hotelService.createHotel(request);

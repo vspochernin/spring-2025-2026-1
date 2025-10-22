@@ -1,11 +1,18 @@
 package ru.vspochernin.booking_service.service;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.vspochernin.booking_service.entity.User;
 
-import java.util.Base64;
+import javax.crypto.SecretKey;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -17,12 +24,24 @@ public class JwtService {
     @Value("${security.jwt.ttl-seconds}")
     private Long ttlSeconds;
 
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes());
+    }
+
     public String generateToken(User user) {
         log.info("Generating JWT token for user: {}", user.getUsername());
 
-        // Упрощённая генерация токена для данного этапа
-        String payload = user.getUsername() + ":" + user.getRole().name() + ":" + System.currentTimeMillis();
-        String token = Base64.getEncoder().encodeToString(payload.getBytes());
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", user.getRole().name());
+        claims.put("username", user.getUsername());
+
+        String token = Jwts.builder()
+                .setClaims(claims)
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + ttlSeconds * 1000))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
 
         log.info("Token generated for user: {}", user.getUsername());
         return token;
@@ -30,8 +49,8 @@ public class JwtService {
 
     public String extractUsername(String token) {
         try {
-            String payload = new String(Base64.getDecoder().decode(token));
-            return payload.split(":")[0];
+            Claims claims = extractAllClaims(token);
+            return claims.getSubject();
         } catch (Exception e) {
             log.warn("Invalid JWT token: {}", e.getMessage());
             return null;
@@ -40,8 +59,8 @@ public class JwtService {
 
     public String extractRole(String token) {
         try {
-            String payload = new String(Base64.getDecoder().decode(token));
-            return payload.split(":")[1];
+            Claims claims = extractAllClaims(token);
+            return claims.get("role", String.class);
         } catch (Exception e) {
             log.warn("Invalid JWT token: {}", e.getMessage());
             return null;
@@ -50,18 +69,19 @@ public class JwtService {
 
     public boolean isTokenValid(String token) {
         try {
-            String payload = new String(Base64.getDecoder().decode(token));
-            String[] parts = payload.split(":");
-            if (parts.length != 3) return false;
-
-            long tokenTime = Long.parseLong(parts[2]);
-            long currentTime = System.currentTimeMillis();
-            long ttlMillis = ttlSeconds * 1000;
-
-            return (currentTime - tokenTime) < ttlMillis;
+            Claims claims = extractAllClaims(token);
+            return !claims.getExpiration().before(new Date());
         } catch (Exception e) {
             log.warn("Invalid JWT token: {}", e.getMessage());
             return false;
         }
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
