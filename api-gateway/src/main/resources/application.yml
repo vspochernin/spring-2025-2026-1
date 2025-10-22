@@ -6,23 +6,25 @@ spring:
     name: api-gateway
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
-      routes:
-        - id: hotel-route
-          uri: lb://hotel-service
-          predicates:
-            - Path=/api/hotels/**,/api/rooms/**
-          filters:
-            - StripPrefix=0
-        - id: booking-route
-          uri: lb://booking-service
-          predicates:
-            - Path=/api/bookings/**,/api/booking/**,/api/user/**
-          filters:
-            - StripPrefix=0
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+            - id: hotel-route
+              uri: lb://hotel-service
+              predicates:
+                - Path=/api/hotels/**,/api/rooms/**
+              filters:
+                - StripPrefix=0
+            - id: booking-route
+              uri: lb://booking-service
+              predicates:
+                - Path=/api/bookings/**,/api/booking/**,/api/user/**
+              filters:
+                - StripPrefix=0
 
 eureka:
   client:
