@@ -58,7 +58,7 @@ curl -fsS https://start.spring.io/starter.tgz \
   -d description="API Gateway for routing and JWT propagation in the Hotel Booking System" \
   -d javaVersion=21 \
   -d packaging=jar \
-  -d dependencies=cloud-gateway,security,cloud-eureka,actuator,lombok \
+  -d dependencies=cloud-gateway,cloud-eureka,actuator,lombok \
   | tar -xz -C api-gateway
 
 echo "!!!All 4 services initialized!!!"
