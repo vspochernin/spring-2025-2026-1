@@ -6,11 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import ru.vspochernin.booking_service.dto.BookingDto;
 import ru.vspochernin.booking_service.dto.CreateBookingRequest;
 import ru.vspochernin.booking_service.entity.User;
 import ru.vspochernin.booking_service.service.BookingService;
+import ru.vspochernin.booking_service.service.UserService;
 
 import java.util.List;
 
@@ -21,12 +23,14 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final UserService userService;
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<BookingDto> createBooking(@Valid @RequestBody CreateBookingRequest request,
                                                      Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
         log.info("Creating booking for user: {}", user.getUsername());
         BookingDto booking = bookingService.createBooking(request, user);
         return ResponseEntity.ok(booking);
@@ -35,7 +39,8 @@ public class BookingController {
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<List<BookingDto>> getUserBookings(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
         log.info("Retrieving bookings for user: {}", user.getUsername());
         List<BookingDto> bookings = bookingService.getUserBookings(user.getId());
         return ResponseEntity.ok(bookings);
@@ -44,7 +49,8 @@ public class BookingController {
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<BookingDto> getBooking(@PathVariable Long id, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
         log.info("Retrieving booking ID: {} for user: {}", id, user.getUsername());
         BookingDto booking = bookingService.getBookingById(id, user.getId());
         return ResponseEntity.ok(booking);
@@ -53,7 +59,8 @@ public class BookingController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Void> cancelBooking(@PathVariable Long id, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
         log.info("Cancelling booking ID: {} for user: {}", id, user.getUsername());
         bookingService.cancelBooking(id, user.getId());
         return ResponseEntity.ok().build();

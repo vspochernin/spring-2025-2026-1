@@ -32,6 +32,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/api/rooms/*/confirm-availability").permitAll()
+                .requestMatchers("/api/rooms/*/release").permitAll()
+                .requestMatchers("/api/rooms/*/increment-bookings").permitAll()
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2

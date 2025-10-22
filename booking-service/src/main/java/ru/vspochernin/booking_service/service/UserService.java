@@ -61,6 +61,12 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public User findByUsername(String username) {
+        log.info("Finding user by username: {}", username);
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+    }
+
     private UserDto convertToDto(User user) {
         return new UserDto(
                 user.getId(),

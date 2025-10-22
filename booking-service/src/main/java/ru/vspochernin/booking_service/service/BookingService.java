@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vspochernin.booking_service.client.HotelServiceClient;
@@ -11,6 +12,7 @@ import ru.vspochernin.booking_service.dto.BookingDto;
 import ru.vspochernin.booking_service.dto.CreateBookingRequest;
 import ru.vspochernin.booking_service.entity.Booking;
 import ru.vspochernin.booking_service.entity.User;
+import ru.vspochernin.booking_service.exception.RetryExhaustedException;
 import ru.vspochernin.booking_service.repository.BookingRepository;
 
 import java.time.LocalDateTime;
@@ -63,8 +65,21 @@ public class BookingService {
                 bookingRepository.save(savedBooking);
                 log.warn("Booking {} cancelled - room not available", savedBooking.getId());
             }
+        } catch (RetryExhaustedException e) {
+            // При исчерпании повторов переводим в CANCELLED и выполняем компенсацию
+            savedBooking.setStatus(Booking.Status.CANCELLED);
+            bookingRepository.save(savedBooking);
+
+            // Компенсация: освобождаем слот
+            try {
+                releaseSlotWithRetry(request.getRoomId(), requestId);
+            } catch (Exception compensationException) {
+                log.error("Compensation failed for booking {}: {}", savedBooking.getId(), compensationException.getMessage());
+            }
+
+            log.error("Booking {} failed after retry exhaustion: {}", savedBooking.getId(), e.getMessage());
         } catch (Exception e) {
-            // При ошибке переводим в CANCELLED и выполняем компенсацию
+            // При других ошибках переводим в CANCELLED и выполняем компенсацию
             savedBooking.setStatus(Booking.Status.CANCELLED);
             bookingRepository.save(savedBooking);
 
@@ -87,16 +102,35 @@ public class BookingService {
         return hotelServiceClient.confirmAvailability(roomId, requestId);
     }
 
+    @Recover
+    private boolean confirmAvailabilityRecover(Exception ex, Long roomId, String requestId) {
+        log.error("All retry attempts exhausted for confirmAvailability room {} with requestId: {}", roomId, requestId, ex);
+        throw new RetryExhaustedException("Failed to confirm availability after all retry attempts", ex);
+    }
+
     @Retryable(value = {Exception.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     private void incrementTimesBookedWithRetry(Long roomId, String requestId) {
         log.info("Incrementing times booked for room {} with requestId: {}", roomId, requestId);
         hotelServiceClient.incrementTimesBooked(roomId, requestId);
     }
 
+    @Recover
+    private void incrementTimesBookedRecover(Exception ex, Long roomId, String requestId) {
+        log.error("All retry attempts exhausted for incrementTimesBooked room {} with requestId: {}", roomId, requestId, ex);
+        throw new RetryExhaustedException("Failed to increment times booked after all retry attempts", ex);
+    }
+
     @Retryable(value = {Exception.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     private void releaseSlotWithRetry(Long roomId, String requestId) {
         log.info("Releasing slot for room {} with requestId: {}", roomId, requestId);
         hotelServiceClient.releaseSlot(roomId, requestId);
+    }
+
+    @Recover
+    private void releaseSlotRecover(Exception ex, Long roomId, String requestId) {
+        log.error("All retry attempts exhausted for releaseSlot room {} with requestId: {}", roomId, requestId, ex);
+        // Для компенсации не бросаем исключение, просто логируем
+        log.warn("Compensation failed for room {} with requestId: {} - manual intervention may be required", roomId, requestId);
     }
 
     public List<BookingDto> getUserBookings(Long userId) {
