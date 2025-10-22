@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(name = "hotel-service", url = "http://localhost:8081")
+@FeignClient(name = "hotel-service")
 public interface HotelServiceClient {
 
     @PostMapping("/api/rooms/{id}/confirm-availability")
