@@ -113,6 +113,7 @@ curl -H "Authorization: Bearer $TOKEN" \
   http://localhost:8080/api/booking
 ```
 
+
 ## Административные операции
 
 ### Авторизация администратора
@@ -144,6 +145,7 @@ curl -X POST http://localhost:8080/api/rooms \
   }'
 ```
 
+
 ## Проверка системы
 
 ### 1. Проверка Eureka
@@ -152,6 +154,18 @@ curl -X POST http://localhost:8080/api/rooms \
 ### 2. Проверка Gateway
 ```bash
 curl http://localhost:8080/actuator/health
+```
+
+### 3. Проверка основных функций
+```bash
+# Проверка отелей
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/hotels
+
+# Проверка номеров
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/rooms
+
+# Проверка рекомендаций
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/rooms/recommend
 ```
 
 ## Траблшутинг
@@ -197,6 +211,11 @@ spring:
 ### Gateway не маршрутизирует запросы
 - Убедитесь, что Gateway запущен последним
 - Проверьте, что все сервисы зарегистрированы в Eureka
+
+### Curl команды зависают или возвращают 401
+- Убедитесь, что токен правильно сохранен в переменной
+- Проверьте, что все сервисы запущены
+- Убедитесь, что JWT секрет задан
 
 ## Тестирование
 
