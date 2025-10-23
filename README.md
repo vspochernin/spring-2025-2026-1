@@ -158,19 +158,7 @@ curl -X POST http://localhost:8080/api/rooms \
 curl http://localhost:8080/actuator/health
 ```
 
-### 3. Проверка основных функций
-```bash
-# Проверка отелей
-curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/hotels
-
-# Проверка номеров
-curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/rooms
-
-# Проверка рекомендаций
-curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/rooms/recommend
-```
-
-## Траблшутинг
+## Решение возможных проблем
 
 ### Порт уже занят
 ```bash
@@ -192,8 +180,7 @@ export SECURITY_JWT_SECRET="your-secret-key-here-at-least-32-characters"
 
 ### Нет администратора
 - Система автоматически создает админа при первом запуске
-- Логин: `admin`, пароль: `admin`
-- Или используйте переменные окружения `BOOTSTRAP_ADMIN_USER`/`BOOTSTRAP_ADMIN_PASS`
+- Логин: `admin`, пароль: `admin` (либо можно использовать переменные окружения `BOOTSTRAP_ADMIN_USER`/`BOOTSTRAP_ADMIN_PASS`)
 
 ### H2 консоль недоступна
 - H2 консоль отключена в production режиме
