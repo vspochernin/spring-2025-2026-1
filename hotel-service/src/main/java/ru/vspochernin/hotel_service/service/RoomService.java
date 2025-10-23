@@ -21,6 +21,7 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
+    private final IdempotencyService idempotencyService;
 
     @Transactional
     public RoomDto createRoom(CreateRoomRequest request) {
@@ -59,6 +60,12 @@ public class RoomService {
     public boolean confirmAvailability(Long roomId, String requestId) {
         log.info("Confirming availability for room ID: {} with requestId: {}", roomId, requestId);
 
+        // Проверка идемпотентности
+        if (idempotencyService.isProcessed(requestId)) {
+            log.info("Request {} already processed - returning cached result (true)", requestId);
+            return true; // Возвращаем успешный результат для уже обработанного запроса
+        }
+
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found with ID: " + roomId));
 
@@ -68,6 +75,7 @@ public class RoomService {
         }
 
         // Временная блокировка слота (в реальной системе здесь была бы логика блокировки)
+        idempotencyService.markAsProcessed(requestId);
         log.info("Room {} availability confirmed for requestId: {}", roomId, requestId);
         return true;
     }
@@ -84,8 +92,15 @@ public class RoomService {
     }
 
     @Transactional
-    public void incrementTimesBooked(Long roomId) {
-        log.info("Incrementing times booked for room ID: {}", roomId);
+    public void incrementTimesBooked(Long roomId, String requestId) {
+        log.info("Incrementing times booked for room ID: {} with requestId: {}", roomId, requestId);
+
+        // Проверка идемпотентности
+        String incrementKey = requestId + "-increment";
+        if (idempotencyService.isProcessed(incrementKey)) {
+            log.info("Request {} already processed - skipping increment", incrementKey);
+            return;
+        }
 
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found with ID: " + roomId));
@@ -93,6 +108,7 @@ public class RoomService {
         room.setTimesBooked(room.getTimesBooked() + 1);
         roomRepository.save(room);
 
+        idempotencyService.markAsProcessed(incrementKey);
         log.info("Times booked incremented for room {}: {}", roomId, room.getTimesBooked());
     }
 

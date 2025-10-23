@@ -52,7 +52,7 @@ public class InternalRoomController {
 
         log.info("Internal endpoint: incrementing times booked for room ID: {} with requestId: {}", id, requestId);
 
-        roomService.incrementTimesBooked(id);
+        roomService.incrementTimesBooked(id, requestId);
 
         log.info("Times booked incremented for room {} with requestId: {}", id, requestId);
         return ResponseEntity.ok().build();
