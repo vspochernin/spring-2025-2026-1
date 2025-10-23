@@ -19,13 +19,13 @@
 - WSL2/Ubuntu (рекомендуется)
 - Maven (встроен в проект как `./mvnw`)
 
-## Переменные окружения
+## Возможные переменные окружения
 
 ```bash
-# JWT секрет (обязательно)
+# JWT секрет
 export SECURITY_JWT_SECRET="your-secret-key-here-at-least-32-characters"
 
-# Bootstrap админ (опционально)
+# Bootstrap админ
 export BOOTSTRAP_ADMIN_USER="admin"
 export BOOTSTRAP_ADMIN_PASS="admin"
 ```
@@ -56,7 +56,7 @@ cd api-gateway
 ./mvnw spring-boot:run
 ```
 
-**Порядок запуска важен!** Сначала Eureka, затем сервисы, в конце Gateway.
+**Порядок запуска важен!** Сначала необходимо запустить Eureka, затем сервисы, в конце Gateway.
 
 ## Как пользоваться системой
 
@@ -116,7 +116,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 ```
 
 
-## Административные операции
+## Администраторские операции
 
 ### Авторизация администратора
 ```bash
@@ -168,11 +168,6 @@ lsof -i :8080
 kill -9 <PID>
 ```
 
-### JWT секрет не задан
-```bash
-export SECURITY_JWT_SECRET="your-secret-key-here-at-least-32-characters"
-```
-
 ### Eureka недоступна
 - Проверьте, что Eureka Server запущен первым
 - Убедитесь, что порт 8761 свободен
@@ -181,16 +176,6 @@ export SECURITY_JWT_SECRET="your-secret-key-here-at-least-32-characters"
 ### Нет администратора
 - Система автоматически создает админа при первом запуске
 - Логин: `admin`, пароль: `admin` (либо можно использовать переменные окружения `BOOTSTRAP_ADMIN_USER`/`BOOTSTRAP_ADMIN_PASS`)
-
-### H2 консоль недоступна
-- H2 консоль отключена в production режиме
-- Для разработки включите в `application.yml`:
-```yaml
-spring:
-  h2:
-    console:
-      enabled: true
-```
 
 ### Сервисы не регистрируются в Eureka
 - Проверьте, что Eureka Server запущен
@@ -211,10 +196,10 @@ spring:
 ### Запуск интеграционных тестов
 ```bash
 # Booking Service
-cd booking-service && ./mvnw test -Dtest=BookingIntegrationTest
+cd booking-service && ./mvnw test
 
 # Hotel Service
-cd hotel-service && ./mvnw test -Dtest=HotelIntegrationTest
+cd hotel-service && ./mvnw test
 ```
 
 ## Соответствие критериям оценивания
@@ -277,4 +262,4 @@ cd hotel-service && ./mvnw test -Dtest=HotelIntegrationTest
 
 ### Критерий 15. Поддерживаемость тестов
 **Требовалось**: Читаемые тесты, независимость от окружения
-**Реализовано**: Читаемые тесты с AAA структурой. Тесты независимы от окружения. Все основные сценарии покрыты тестами.
+**Реализовано**: Читаемые тесты. Тесты независимы от окружения. Все основные сценарии покрыты тестами.
